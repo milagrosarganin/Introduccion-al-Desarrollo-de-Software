@@ -132,3 +132,56 @@ En docker los contenedores son efímeros, entonces hay que guardar los contenedo
 #### Docker uné contenedores por sus nombres a traves de redes virtuakes en vez de hacerlo con IPs complicadas
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
+
+### Ejemplo de docker file
+
+Los docker file siempre empiezan con FROM y casi siemore terminan con CMD
+Creo un archivo en vsc llamado Dockerfile
+   FROM: ubuntu: 24.04
+
+   CMD ["bash"]
+
+En la termiinal van los comandos:
+
+1. Construir la Imagen (Empaquetar los ingredientes)
+   
+   Primero, le dices a Docker que lea tu archivo y cree la Imagen. 
+   Para eso usas el comando *docker build -t mi-ubuntu-personalizado .*
+   
+   - build: Le dice a Docker que construya algo.
+   - -t mi-ubuntu-personalizado: Le pone una "etiqueta" (nombre) a tu imagen para que la encuentres fácil.. 
+   - (el punto al final): Es súper importante. Le dice a Docker "busca el Dockerfile en esta carpeta actual".
+   
+   Al hacer esto, Docker descargará Ubuntu y lo guardará estáticamente en tu computadora.
+   
+2. Ejecutar el Contenedor (Servir el plato)
+      
+   Ahora que tienes la Imagen, vas a crear un contenedor vivo a partir de ella, con el comando *docker run -it mi-ubuntu-personalizado*
+
+   - run: Ejecuta un contenedor.
+   - -it: Mantiene la terminal abierta e interactiva (necesario porque en tu Dockerfile pusimos que ejecute bash, que es la línea de comandos de Linux).
+   
+   ¡Y listo! 
+   De repente, tu terminal cambiará y estarás "dentro" de un mini-sistema operativo Ubuntu corriendo de forma aislada dentro de tu computadora.
+   
+   #### ¿Cuándo y para qué uso Docker realmente?
+   
+      Docker brilla en situaciones donde necesitas aislamiento, portabilidad y reproducibilidad. Aquí tienes los casos de uso más comunes en el día a día de un desarrollador:
+      - Para matar el "en mi máquina sí funciona": Imagina que haces una app en Windows, pero tu cliente usa servidores con Linux. Con Docker, empaquetas tu app con su propio entorno. Si el contenedor funciona en tu PC, te garantiza que funcionará exactamente igual en el servidor del cliente.
+      - Para no ensuciar tu computadora: Supongamos que quieres probar una nueva base de datos (como PostgreSQL o MongoDB) o una versión antigua de Python. En lugar de instalar todo eso en tu PC, descargar librerías y arriesgarte a que algo se rompa, simplemente levantas un contenedor. Cuando terminas de jugar, borras el contenedor y tu computadora queda impecable.
+      - Para trabajar en equipo: Si entra un desarrollador nuevo a tu equipo, no tiene que pasar 3 días instalando Node.js, configurando variables o instalando bases de datos. Solo le pasas el repositorio, él ejecuta docker-compose up (un comando que levanta múltiples contenedores a la vez) y en 5 minutos tiene todo el entorno de trabajo listo.
+
+
+### Comandos vitales en docker
+
+- Un Dockerfile es simplemente un archivo de texto con instrucciones secuenciales. Aquí tienes los comandos más vitales que vas a usar:
+
+   - WORKDIR (El Escritorio): Establece el directorio de trabajo interno del contenedor. Es el equivalente a hacer un cd dentro de la terminal de Linux. Todo lo que hagas después (copiar, ejecutar) sucederá en esa carpeta.
+      Ejemplo: WORKDIR /usr/share/nginx/html
+   - COPY (La Transferencia): Toma archivos de tu computadora (Host) y los pega dentro del contenedor.
+      Ejemplo: COPY . . (Copia todo desde tu carpeta actual a la carpeta de trabajo del contenedor).
+   - RUN (El Constructor): Ejecuta comandos de consola mientras la imagen se está construyendo. Se usa para instalar dependencias.
+      Ejemplo: RUN apt-get update && apt-get install curl
+   - ENV (Las Variables): Define variables de entorno que estarán disponibles cuando el contenedor esté vivo. Útil para pasar contraseñas o configuraciones sin escribirlas en el código.
+      Ejemplo: ENV PORT=8080
+   - CMD (El Botón de Encendido): Es el comando por defecto que se va a ejecutar cuando el contenedor arranque (no cuando se construya)
