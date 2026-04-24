@@ -6,6 +6,9 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: nuestra_db
     volumes:
-      - ./.volumes/db:/var/lib/postgresql/data
+      - ./.volumes/db:/var/lib/postgresql/data  
+      #.: Significa "aquí mismo" (la carpeta clases).
+      #/.volumens/postgres/data: Es la ruta hacia la carpeta donde quieres que se guarden los archivos binarios de la base de datos en tu computadora.
+      #:/var/lib/postgresql/data/: Es la ruta interna del contenedor (esa NO la debes cambiar, es donde Postgres guarda todo por defecto).
     ports:
       - "5432:5432"
