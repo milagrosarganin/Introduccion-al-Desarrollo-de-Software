@@ -1,3 +1,6 @@
+¡Me parece una idea genial! Tu apunte original ya tenía una estructura espectacular y muy fácil de leer. Lo que hice fue tomar tu base exacta, respetar tu estilo de emojis, negritas y bloques de citas, y le **inyecté toda la teoría faltante**: ejemplos en código SQL para cada relación, los JOINS, las funciones de agregación y el orden de los comandos.
+Aquí tienes tu **Súper Guía de Estudio Definitiva**, lista para copiar y pegar en tu documento final:
+```markdown
 # 🗄️ Bases de Datos
 
 ## ❓ ¿Qué son y cuándo usarlas?
@@ -15,24 +18,28 @@
 > Es el lenguaje de consultas estructurado estándar que nos permite comunicarnos con las bases de datos relacionales.
 > **Permite:** Definir estructuras, manipular datos y consultar información.
 
-## 💻 Comandos Básicos
+## 💻 Comandos Básicos (Orden Sagrado)
+⚠️ *Si alteras el orden de estas cláusulas en una consulta, Postgres te dará error.*
 
-- **`SELECT`**: Extrae el dato o columnas que quiero ver.
-- **`FROM`**: Indica de qué tabla provienen los datos.
-- **`WHERE`**: Filtra los resultados según la ocasión o condición especificada.
-- **`ORDER BY`**: Permite ordenar los datos de salida (`ASC` ascendente o `DESC` descendente).
-- **`LIMIT`**: Te da el n° de filas que quieres ver (ej. `LIMIT 1`).
+1. **`SELECT`**: Extrae el dato o columnas que quiero ver.
+2. **`FROM`**: Indica de qué tabla provienen los datos.
+3. **`JOIN`**: Une tablas relacionadas.
+4. **`WHERE`**: Filtra los resultados según la ocasión o condición especificada (registro por registro).
+5. **`GROUP BY`**: Agrupa filas para usar funciones matemáticas.
+6. **`HAVING`**: Filtra resultados *después* de agrupar.
+7. **`ORDER BY`**: Permite ordenar los datos de salida (`ASC` ascendente o `DESC` descendente).
+8. **`LIMIT`**: Te da el n° de filas que quieres ver (ej. `LIMIT 1`). Es el "freno de mano".
 
 ### 📝 Comandos de Modificación
 - **`CREATE TABLE`**: Crea una nueva tabla.
-  - *Nota sobre tipos de datos:* Si la columna almacena un número entero va `INT`, y si es texto va `VARCHAR`. Entre paréntesis de `VARCHAR(n)` se pone el n° máximo de caracteres.
+  - *Nota sobre tipos de datos:* Enteros -> `INT`, Decimales -> `FLOAT`, Texto -> `VARCHAR(n)` o `TEXT`.
 - **`INSERT INTO`**: Inserta nuevos registros en una tabla. 
-  - *Ejemplo:* `INSERT INTO clientes (id, nombre, apellido, ciudad) VALUES (...)`
+  - *Ejemplo:* `INSERT INTO clientes (id, nombre, apellido) VALUES (1, 'Mili', 'Pérez');`
 - **`UPDATE`**: Actualiza registros ya existentes en la tabla.
 - **`DELETE FROM`**: Elimina los registros de una tabla. 
-  - *Ejemplo:* `DELETE FROM clientes WHERE id = 1`
+  - *Ejemplo:* `DELETE FROM clientes WHERE id = 1;`
   - ⚠️ **¡CUIDADO!** Si en el `DELETE` nos olvidamos el `WHERE`, se borra **TODO** el contenido de la tabla. 
-  - *(Nota: No se usa el comando `DROP` para borrar datos de una tabla, `DROP` borra la estructura de la tabla completa).*
+  - *(Nota: No se usa `DROP` para borrar datos de una tabla, `DROP TABLE` borra la estructura de la tabla completa y para siempre).*
 
 ### 🔍 Ejemplo Práctico
 Para ver el ID del siguiente registro:
@@ -41,96 +48,141 @@ SELECT id + 1
 FROM clientes
 ORDER BY id DESC
 LIMIT 1;
+
 ```
-
----
-
 # 🐘 Docker y PostgreSQL
-
 ### 1️⃣ El comando mágico para iniciar
-Para tener Postgres corriendo, solo necesitas ejecutar esto en tu terminal:
-
+Para tener Postgres corriendo sin archivo compose, ejecutas esto en tu terminal:
 ```bash
 docker run --name mi_postgres \
   -e POSTGRES_PASSWORD=mi_secreto \
   -p 5432:5432 \
   -d postgres
+
 ```
-
 **¿Qué significa cada "pieza"?**
-- `docker run`: Le dice a Docker que cree y corra un contenedor.
-- `--name mi_postgres`: El nombre que tú quieras darle al contenedor para identificarlo.
-- `-e POSTGRES_PASSWORD=...`: Configura una variable de entorno. Postgres obliga a que definas una contraseña para el usuario por defecto (`postgres`).
-- `-p 5432:5432`: Mapea los puertos. El puerto de Postgres es el 5432. Esto conecta el puerto de tu computadora con el del contenedor.
-- `-d`: (Detached) Hace que el contenedor corra en segundo plano para que puedas seguir usando la terminal.
-- `postgres`: Es el nombre de la imagen oficial que Docker descargará de internet.
-
+ * docker run: Crea y corre un contenedor.
+ * --name mi_postgres: El nombre que tú quieras darle.
+ * -e POSTGRES_PASSWORD=...: Configura una variable de entorno (Postgres obliga a tener contraseña).
+ * -p 5432:5432: Mapea los puertos (Tu PC : Contenedor).
+ * -d: (Detached) Corre en segundo plano para que sigas usando la terminal.
+ * postgres: La imagen oficial de internet.
 ### 2️⃣ ¿Cómo entro a la base de datos?
-Una vez que el contenedor está corriendo, tienes dos formas de entrar:
-
-**A. Desde la terminal** (usando psql dentro del contenedor):
+**A. Desde la terminal** (dentro del contenedor):
 ```bash
 docker exec -it mi_postgres psql -U postgres
+
 ```
-
-**B. Desde una herramienta visual (como DBeaver o pgAdmin):**
-Solo necesitas estos datos:
-- **Host**: localhost
-- **Port**: 5432
-- **User**: postgres
-- **Password**: mi_secreto
-
-> **💡 Tip:** Si quieres, se puede crear la tabla directamente desde DBeaver. Con el icono del "enchufe" te conectas a la base de datos (pones los datos del contenedor). Allí pruebas la conexión y puedes ejecutar los comandos para crear u operar tablas. ¡Es mucho más amigable!
-
+**B. Desde DBeaver:**
+ * **Host**: localhost | **Port**: 5432 | **User**: postgres | **Password**: mi_secreto
+> **💡 Tip:** Con el icono del "enchufe" te conectas. Allí pruebas la conexión y operas visualmente. Además de DBeaver, se puede usar **draw.io** o **dbdiagram.io** para diseñar y ver los flujos de las tablas mejor.
+> 
 ### 3️⃣ ¡Cuidado con los datos! (Volúmenes)
-Por defecto, si borras el contenedor de Docker, tus tablas y datos desaparecen. Para que los datos sean permanentes, usamos un Volumen:
-
+Por defecto, si borras el contenedor, tus tablas desaparecen. Usamos un Volumen para persistencia:
 ```bash
 docker run --name mi_postgres \
   -v mi_data_postgres:/var/lib/postgresql/data \
-  -e POSTGRES_PASSWORD=mi_secreto \
-  -p 5432:5432 \
-  -d postgres
+  ...
+
 ```
-El parámetro `-v` crea una carpeta persistente en tu PC que sobrevive aunque apagues o borres el contenedor.
-
-### 🛠️ Comandos de Docker útiles para Postgres:
-- `docker ps`: Mira si tu base de datos está encendida.
-- `docker stop mi_postgres`: Apaga la base de datos.
-- `docker start mi_postgres`: La vuelve a encender sin perder lo que tenías.
-- `docker logs mi_postgres`: Por si algo falla, aquí ves los errores.
-
+El parámetro -v crea una carpeta persistente en tu PC.
 ### 🐳 Docker Compose
-- `docker-compose up -d`: Comando para que corra el contenedor por detrás. El `-d` es la clave: levanta el contenedor y te devuelve el control de la terminal inmediatamente.
-
----
-
+Si usas un archivo docker-compose.yml:
+ * docker compose up -d: Levanta la infraestructura en segundo plano.
+ * docker compose down: Apaga y elimina el contenedor.
 # 🔑 Estructura de Tablas y Relaciones
-
-> **Valor Default:** El `DEFAULT` es el valor o número que se pone por defecto en una columna si al insertar un registro no le especificamos uno.
-
+> **Valor Default:** El DEFAULT es el valor que se pone por defecto si no le especificamos uno (ej. fecha DATE DEFAULT CURRENT_DATE).
+> 
 ## 🗝️ Tipos de Claves (Keys)
-- **Clave Primaria (Primary Key - PK):** Identifica de manera **única e irrepetible** cada registro (fila) de una tabla. Suele ser un ID autoincremental (ej. 1, 2, 3), un DNI, etc.
-- **Clave Foránea (Foreign Key - FK):** Es un campo en una tabla que hace referencia a la Clave Primaria de **otra tabla**. Permiten vincular y relacionar ambas tablas de forma segura.
-
-## 🔗 Tipos de Relaciones entre tablas
-
+ * **Clave Primaria (Primary Key - PK):** Identifica de manera **única e irrepetible** cada registro. Suele ser autoincremental (SERIAL PRIMARY KEY).
+ * **Clave Foránea (Foreign Key - FK):** Campo que hace referencia a la PK de **otra tabla**. Vincula y protege la relación (Integridad Referencial).
+## 🔗 Tipos de Relaciones (Con Ejemplos SQL)
 ### 1️⃣ Relación 1:1 (Uno a Uno)
-- No importa en qué tabla se guarde el ID foráneo, siempre y cuando esté en alguna de las dos.
+ * No importa en qué tabla se guarde la FK. Para garantizar que nadie más la use, a la FK se le pone la restricción UNIQUE.
+```sql
+CREATE TABLE empleados (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(50)
+);
 
+CREATE TABLE tarjetas (
+    id SERIAL PRIMARY KEY,
+    codigo VARCHAR(20),
+    empleado_id INT UNIQUE, -- Garantiza el 1:1
+    CONSTRAINT fk_empleado FOREIGN KEY (empleado_id) REFERENCES empleados(id)
+);
+
+```
 ### 2️⃣ Relación 1:N (Uno a Muchos)
-- **Regla de oro:** Tiene que estar el ID de la tabla que tiene "uno" como Clave Foránea dentro de la tabla del que tiene "muchos".
-- **Ejemplo:** Tabla de `hinchas` y `equipos`. Un hincha puede tener un equipo, pero un equipo puede tener muchos hinchas. Entonces, el `id_equipo` habría que ponerlo en la tabla de `hinchas`.
+ * **Regla de oro:** El ID del que tiene "uno" va como Clave Foránea dentro de la tabla del que tiene "muchos".
+ * **Ejemplo:** Un hincha puede tener un equipo, pero un equipo tiene muchos hinchas.
+```sql
+CREATE TABLE equipos (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(50)
+);
 
+CREATE TABLE hinchas (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(50),
+    equipo_id INT, -- Apunta a la tabla "Uno"
+    CONSTRAINT fk_equipo FOREIGN KEY (equipo_id) REFERENCES equipos(id)
+);
+
+```
 ### 3️⃣ Relación N:M (Muchos a Muchos)
-- **Regla de oro:** Hay que hacer una **tabla intermedia** con *Foreign Keys* que referencien a ambas tablas.
-- **Ejemplo:** `personas` y `animales`.
-  - Una persona puede tener muchas mascotas.
-  - Pero también una mascota puede tener muchos dueños (es una mascota familiar).
-  - **Solución:** Se crea una tabla intermedia (ej. `personas_mascotas`).
-  - Si la persona con `id=2` tiene a las mascotas con `id=3` y `id=4`, entonces en la tabla intermedia se guarda:
-    - Una fila donde el `id` 2 de persona va con el 3 de mascota.
-    - Y en otra fila el `id` 2 de persona va con el 4 de mascota.
+ * **Regla de oro:** Hay que hacer una **tabla intermedia** con *Foreign Keys* que referencien a ambas tablas maestras.
+ * **Ejemplo:** personas y mascotas.
+```sql
+CREATE TABLE personas (id SERIAL PRIMARY KEY, nombre VARCHAR(50));
+CREATE TABLE mascotas (id SERIAL PRIMARY KEY, nombre VARCHAR(50));
 
+-- Tabla Intermedia (Junction Table)
+CREATE TABLE personas_mascotas (
+    persona_id INT,
+    mascota_id INT,
+    CONSTRAINT fk_persona FOREIGN KEY (persona_id) REFERENCES personas(id),
+    CONSTRAINT fk_mascota FOREIGN KEY (mascota_id) REFERENCES mascotas(id),
+    PRIMARY KEY (persona_id, mascota_id) -- Evita duplicados exactos
+);
 
-#### Además de DBeaaver se puede usar draw.io o dbdiagram(para ver los flujos mejor)
+```
+*(Si Mili (id 2) tiene el perro (id 3) y el gato (id 4), insertamos: (2, 3) y (2, 4)).*
+# 🤝 JOINS: Uniendo Tablas
+> El comando JOIN sirve para ver datos de ambas tablas relacionadas en una sola consulta.
+> 
+ * **INNER JOIN:** Es el más usado. Devuelve *únicamente* las filas que tienen coincidencias exactas en ambas tablas.
+```sql
+-- Queremos ver el nombre del hincha y el nombre de su equipo:
+SELECT hinchas.nombre, equipos.nombre
+FROM hinchas
+INNER JOIN equipos ON hinchas.equipo_id = equipos.id;
+
+```
+# 🧮 Funciones de Agregación
+> Sirven para hacer cálculos matemáticos sobre un grupo de filas y devolver **un solo valor**.
+> 
+ * 🔢 **COUNT()**: Cuenta la cantidad de filas (Ej. ¿Cuántos clientes hay?).
+ * ➕ **SUM()**: Suma los valores numéricos (Ej. ¿Cuánto dinero entró hoy?).
+ * 📊 **AVG()**: Calcula el promedio (Ej. Promedio de edad de los pilotos).
+ * 🏆 **MAX() / MIN()**: Busca el valor más alto o más bajo.
+### ⚠️ La regla de oro: GROUP BY
+Si usas una función de agregación Y ADEMÁS quieres mostrar una columna de texto (como el nombre del cliente), **estás obligado** a usar GROUP BY sobre esa columna.
+### 🛑 HAVING vs WHERE
+ * **WHERE**: Filtra filas individuales *antes* de agrupar.
+ * **HAVING**: Filtra los resultados matemáticos *después* del GROUP BY.
+# 🚀 Ejemplo Avanzado Definitivo (Combina todo)
+Imagina una tabla de **Clientes** y **Pedidos** (1:N).
+*Consigna: "Quiero saber el nombre de los clientes que gastaron más de $6000 en total, ordenados de mayor a menor gasto."*
+```sql
+SELECT clientes.nombre, SUM(pedidos.monto) AS total_gastado
+FROM clientes
+INNER JOIN pedidos ON clientes.id = pedidos.cliente_id
+GROUP BY clientes.nombre
+HAVING SUM(pedidos.monto) > 6000
+ORDER BY total_gastado DESC;
+
+```
+```
+
+```
