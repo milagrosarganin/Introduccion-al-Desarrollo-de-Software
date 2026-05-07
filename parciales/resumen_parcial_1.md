@@ -1,4 +1,4 @@
-#RESUMEN PARCIAL 1
+# RESUMEN PARCIAL 1
 
 ## 🏗️ 1. Ingeniería de Software: El "Mapa" del Proyecto
 Cuando leas el escenario, identifica en qué etapa están. La ingeniería no es solo programar, es el proceso completo para resolver un problema.
